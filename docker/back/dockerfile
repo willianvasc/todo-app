@@ -1,0 +1,22 @@
+# Imagem base
+FROM node:16
+
+# Diretório de trabalho
+WORKDIR /app
+
+# Copiar os arquivos do backend para o container
+COPY backend/package*.json ./
+
+# Instalar as dependências
+RUN npm init -y
+RUN npm install
+RUN npm install express mysql2 cors
+
+# Copiar o restante dos arquivos do backend
+COPY backend/ ./
+
+# Expor a porta em que o servidor vai rodar
+EXPOSE 3000
+
+# Comando para rodar a aplicação
+CMD ["node", "index.js"]

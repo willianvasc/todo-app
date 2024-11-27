@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  react-app:
+    build:
+      context: ./frontend
+      dockerfile: ../docker/front/dockerfile
+    ports:
+      - "80:80"
+    volumes:
+      - ./frontend/src:/app/src
+    environment:
+      - NODE_ENV=production
+
+  node-backend:
+    build:
+      context: .
+      dockerfile: ./docker/back/dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mysql
+    environment:
+      - DB_HOST=mysql
+      - DB_USER=user
+      - DB_PASSWORD=password
+      - DB_NAME=todos_db
+
+  mysql:
+    build:
+      context: .
+      dockerfile: ./docker/mysql/dockerfile
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: todos_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+volumes:
+  mysql-data:

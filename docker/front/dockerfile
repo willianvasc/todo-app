@@ -1,0 +1,33 @@
+# Etapa 1: Imagem base para build (Node.js)
+FROM node:16 AS build
+
+# Diretório de trabalho dentro do container
+WORKDIR /app
+
+# Copiar o package.json e package-lock.json para o container
+COPY package*.json ./
+
+# Instalar as dependências
+RUN npm install
+
+# Instalar nodemon globalmente (opcional, útil no desenvolvimento)
+RUN npm install -g nodemon
+RUN npm install axios
+
+# Copiar o restante do código da aplicação
+COPY . .
+
+# Construir a aplicação
+RUN npm run build
+
+# Etapa 2: Imagem base para servir a aplicação (Nginx)
+FROM nginx:alpine
+
+# Copiar os arquivos de build para o nginx
+COPY --from=build /app/build /usr/share/nginx/html
+
+# Expor a porta em que o nginx estará rodando
+EXPOSE 80
+
+# Iniciar o nginx
+CMD ["nginx", "-g", "daemon off;"]
